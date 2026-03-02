@@ -1,9 +1,8 @@
 import os
 import json
+from github_integration import push_to_github
 
 REPORT_PATH = "../reports/security_report.json"
-
-from github_integration import push_to_github
 
 def enforce_policy():
 
@@ -20,15 +19,23 @@ def enforce_policy():
     else:
         latest = data
 
-    risk = latest["risk_score"]
-    status = latest["status"]
+    # Ensure proper type handling
+    risk = int(latest["risk_score"])
+    status = str(latest["status"]).upper()
 
     print("---- Deployment Policy Check ----")
     print("Status:", status)
     print("Risk Score:", risk)
 
-    if risk >= 80:
-        print("❌ Deployment BLOCKED due to security risk.")
-    else:
-        print("✅ Deployment ALLOWED.")
-        push_to_github("../dataset/current_build.txt", "production_artifact.txt")
+    # 🚨 Strict Security Policy
+    if status in ["CRITICAL", "COMPROMISED"]:
+        print("❌ Deployment BLOCKED due to critical security status.")
+        return
+
+    if risk >= 50:
+        print("❌ Deployment BLOCKED due to high risk score.")
+        return
+
+    # ✅ If safe
+    print("✅ Deployment ALLOWED.")
+    push_to_github("../dataset/current_build.txt", "production_artifact.txt")
