@@ -1,0 +1,25 @@
+name: AI DevSecOps Production Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Show Commit Info
+        run: echo "New deployment commit detected."
+
+      - name: Display Production Artifact
+        run: |
+          echo "---- Production Artifact Content ----"
+          cat production_artifact.txt || echo "No artifact found"
+
+      - name: Deployment Completed
+        run: echo "Pipeline Finished Successfully"
