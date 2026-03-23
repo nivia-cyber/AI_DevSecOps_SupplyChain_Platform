@@ -1,25 +1,79 @@
-def calculate_risk(suspicious_count, entropy, prediction):
+import hashlib
 
-    risk = 0
+BUILD_FILE = "dataset/current_build.py"
 
-    risk += suspicious_count * 15
-    risk += entropy * 5
+def run_risk_engine():
 
-    if prediction == 1:
-        risk += 40
+    print("2️⃣ Running Risk Engine...")
 
-    return min(int(risk), 100)
+    with open(BUILD_FILE,"r") as f:
+        content = f.read().lower()
 
+    # -----------------------------
+    # Risk detection
+    # -----------------------------
 
-def classify_severity(risk_score):
+    if "powershell" in content or "reverse_shell" in content:
+        risk_score = 90
+        status = "CRITICAL"
 
-    if risk_score >= 85:
-        return "CRITICAL"
-    elif risk_score >= 60:
-        return "HIGH"
-    elif risk_score >= 40:
-        return "MEDIUM"
-    elif risk_score >= 20:
-        return "LOW"
+    elif "base64" in content or "credential" in content:
+        risk_score = 70
+        status = "HIGH"
+
+    elif "network" in content or "unknown_network" in content:
+        risk_score = 45
+        status = "MEDIUM"
+
     else:
-        return "MINIMAL"
+        risk_score = 7
+        status = "CLEAN"
+
+    # -----------------------------
+    # SHA256
+    # -----------------------------
+
+    sha256 = hashlib.sha256(content.encode()).hexdigest()
+
+    # -----------------------------
+    # Features
+    # -----------------------------
+
+    features = {
+        "api_calls": content.count("api"),
+        "entropy": round(len(set(content))/100,2),
+        "network_calls": content.count("network")
+    }
+
+    # -----------------------------
+    # MITRE ATT&CK Mapping
+    # -----------------------------
+
+    mitre = []
+
+    if "powershell" in content:
+        mitre.append("T1059 - Command Interpreter")
+
+    if "reverse_shell" in content:
+        mitre.append("T1105 - Ingress Tool Transfer")
+
+    if "network" in content:
+        mitre.append("T1046 - Network Discovery")
+
+    if "base64" in content:
+        mitre.append("T1027 - Obfuscated Files")
+
+    if "credential" in content or "password" in content:
+        mitre.append("T1552 - Credential Access")
+
+    print("✔ Risk analysis complete.")
+    print("Risk Score:",risk_score)
+    print("Status:",status)
+
+    return {
+        "risk_score":risk_score,
+        "status":status,
+        "sha256":sha256,
+        "features":features,
+        "mitre_techniques":mitre
+    }

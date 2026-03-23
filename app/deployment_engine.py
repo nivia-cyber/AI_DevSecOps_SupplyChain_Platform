@@ -1,41 +1,25 @@
-import os
-import json
-from github_integration import push_to_github
+def enforce_policy(risk_score):
 
-REPORT_PATH = "../reports/security_report.json"
+    print("🔒 Enforcing Deployment Policy...")
 
-def enforce_policy():
+    if risk_score < 30:
 
-    if not os.path.exists(REPORT_PATH):
-        print("No report found.")
-        return
+        deployment = "DEPLOYED"
+        reason = "Clean artifact – safe for production"
 
-    with open(REPORT_PATH, "r") as f:
-        data = json.load(f)
+    elif risk_score < 60:
 
-    # If report is list, take latest entry
-    if isinstance(data, list):
-        latest = data[-1]
+        deployment = "BLOCKED"
+        reason = "Medium risk detected"
+
+    elif risk_score < 85:
+
+        deployment = "BLOCKED"
+        reason = "High risk detected"
+
     else:
-        latest = data
 
-    # Ensure proper type handling
-    risk = int(latest["risk_score"])
-    status = str(latest["status"]).upper()
+        deployment = "BLOCKED"
+        reason = "Critical security threat"
 
-    print("---- Deployment Policy Check ----")
-    print("Status:", status)
-    print("Risk Score:", risk)
-
-    # 🚨 Strict Security Policy
-    if status in ["CRITICAL", "COMPROMISED"]:
-        print("❌ Deployment BLOCKED due to critical security status.")
-        return
-
-    if risk >= 50:
-        print("❌ Deployment BLOCKED due to high risk score.")
-        return
-
-    # ✅ If safe
-    print("✅ Deployment ALLOWED.")
-    push_to_github("../dataset/current_build.txt", "production_artifact.txt")
+    return deployment, reason

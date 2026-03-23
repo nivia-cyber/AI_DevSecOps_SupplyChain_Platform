@@ -1,9 +1,6 @@
 import os
 import requests
 import base64
-from dotenv import load_dotenv
-
-load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
