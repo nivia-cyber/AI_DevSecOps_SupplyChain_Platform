@@ -1,4 +1,1 @@
-
-safe application logic
-normal api usage
-processing data
+safe code
